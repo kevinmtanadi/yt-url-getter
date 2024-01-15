@@ -13,10 +13,15 @@ app.get('/get_url', async (req, res) => {
     return res.status(400).json({ error: 'Missing video URL' });
   }
 
-  const info = await ytdl.getInfo(videoURL);
-  let audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
-
-  ytdl.downloadFromInfo(info, { filter: 'audioonly' }).pipe(res);
+  try {
+    const info = await ytdl.getInfo(videoURL);
+    let audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
+  
+    ytdl.downloadFromInfo(info, { filter: 'audioonly' }).pipe(res);
+  } catch(error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to download video, unknown url' });
+  }
 })
 
 app.listen(3000, '0.0.0.0', () => {
